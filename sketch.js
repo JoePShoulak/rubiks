@@ -6,7 +6,7 @@ let c;
 
 function setup() {
   createCanvas(innerWidth, innerHeight, "webgl");
-  c = new Cube(3, 20);
+  c = new Cube(3, 200);
 
   createEasyCam();
   document.oncontextmenu = () => false;
@@ -15,8 +15,4 @@ function setup() {
 function draw() {
   background(20);
   c.show();
-  noFill();
-  stroke("orange");
-  strokeWeight(0.1);
-  sphere(50);
 }

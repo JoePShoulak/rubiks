@@ -1,1 +1,1 @@
-const arrayMap = (size, cb) => Array(size).fill().map(cb);
+const arrayFromMap = (size, cb) => Array(size).fill().map(cb);

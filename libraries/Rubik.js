@@ -1,8 +1,24 @@
+const newDiagVector = (val) => new p5.Vector(1, 1, 1).mult(val);
+
 class Cubie {
-  constructor(x, y, z, length, dim) {
+  constructor(x, y, z, size, dim) {
+    this.dim = dim;
+    this.length = size / dim;
+
+    const offset = newDiagVector((dim - 1) / 2);
+
     this.position = new p5.Vector(x, y, z);
-    this.graphicPosition = this.position.copy().sub(1, 1, 1).mult(length);
-    this.length = length;
+    this.graphicPosition = this.position.copy().sub(offset).mult(this.length);
+  }
+
+  get onFace() {
+    const onFace = (num) => num === 0 || num === this.dim - 1;
+
+    return (
+      onFace(this.position.x) ||
+      onFace(this.position.y) ||
+      onFace(this.position.z)
+    );
   }
 
   show() {
@@ -18,30 +34,20 @@ class Cubie {
 
 class Cube {
   static generateCubies(dim, size) {
-    return arrayMap(dim, (_face, i) =>
-      arrayMap(dim, (_row, j) =>
-        arrayMap(dim, (_cubie, k) => new Cubie(i, j, k, size, dim)).filter(
-          (cubie) => {
-            const onFace = (num) => num === 0 || num === dim - 1;
-
-            return (
-              onFace(cubie.position.x) ||
-              onFace(cubie.position.y) ||
-              onFace(cubie.position.z)
-            );
-          }
-        )
+    return arrayFromMap(dim, (_face, i) =>
+      arrayFromMap(dim, (_row, j) =>
+        arrayFromMap(dim, (_c, k) => new Cubie(i, j, k, size, dim))
       )
     )
       .flat()
-      .flat();
+      .flat()
+      .filter((cubie) => cubie.onFace);
   }
 
   constructor(dim, size) {
-    this.dim = dim;
-    this.size = size;
+    // this.dim = dim;
+    // this.size = size;
     this.cubies = Cube.generateCubies(dim, size);
-    console.log(this.cubies);
   }
 
   show() {
