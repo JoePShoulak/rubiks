@@ -43,13 +43,3 @@ function dirToVec({ i, v }) {
   arr[i] = v;
   return new p5.Vector(...arr);
 }
-
-const undoMoves = (moves) => {
-  return moves
-    .map((m) => {
-      if (m.includes("2")) return m;
-      if (m.includes("_")) return m[0];
-      if (m.length === 1) return `${m}_`;
-    })
-    .reverse();
-};

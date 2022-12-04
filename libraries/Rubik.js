@@ -28,9 +28,11 @@ class Cube {
     F: { i: 2, v: 1 },
   };
 
-  constructor(dim, size, { colorScheme } = {}) {
+  constructor(dim, size, { colorScheme, animateRate } = {}) {
     this.dim = dim;
     this.colorScheme = colorScheme ?? Cube.colorSchemes.western;
+    this.animateRate = animateRate ?? 25;
+
     this.cubies = arrayFromMap(dim, (_face, i) =>
       arrayFromMap(dim, (_row, j) =>
         arrayFromMap(dim, (_c, k) => new Cubie(this, i, j, k, size, dim))
@@ -55,7 +57,7 @@ class Cube {
   }
 
   get rotate() {
-    const angle = HALF_PI;
+    const angle = HALF_PI / this.animateRate;
 
     function rotFace(cubies, axis, rev = false) {
       cubies.forEach((cubie) => {
@@ -163,8 +165,11 @@ class Cubie {
     });
   }
 
+  _align() {
+    this.position = roundVector(this.position);
+  }
+
   _updateGraphicPosition() {
-    this._align();
     this.graphicPosition = this.position
       .copy()
       .sub(this.drawOffset)
@@ -179,10 +184,6 @@ class Cubie {
 
   get onFace() {
     return this._visibleStickers > 0;
-  }
-
-  _align() {
-    this.position = roundVector(this.position);
   }
 
   drawFace(face) {
