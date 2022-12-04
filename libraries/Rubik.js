@@ -31,11 +31,7 @@ class Cube {
   constructor(dim, size, { colorScheme } = {}) {
     this.dim = dim;
     this.colorScheme = colorScheme ?? Cube.colorSchemes.western;
-    this.cubies = this._generateCubies(dim, size);
-  }
-
-  _generateCubies(dim, size) {
-    return arrayFromMap(dim, (_face, i) =>
+    this.cubies = arrayFromMap(dim, (_face, i) =>
       arrayFromMap(dim, (_row, j) =>
         arrayFromMap(dim, (_c, k) => new Cubie(this, i, j, k, size, dim))
       )
