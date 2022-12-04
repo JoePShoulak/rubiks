@@ -47,11 +47,24 @@ class Cube {
 
     Object.entries(Cube.directionMap).forEach(([k, { i, v }]) => {
       faces[k] = cubies.filter(
-        (c) => mapPos(this.dim, vecToArr(c.pos)[i]) === v
+        (c) => mapPos(this.dim, vToA(c.position)[i]) === v
       );
     });
 
     return faces;
+  }
+
+  rotate() {
+    cube.faces.U.forEach((cubie) => {
+      const axis = new p5.Vector(0, 1, 0);
+      const offset = cubie.drawOffset;
+      const pos = cubie.position.sub(offset);
+      cubie.position = rotateAround(pos, axis, HALF_PI).add(offset);
+      cubie.stickers = cubie.stickers.map((s) =>
+        rotateSticker(s, axis, HALF_PI)
+      );
+      cubie._updateGraphicPosition();
+    });
   }
 
   draw() {
@@ -87,11 +100,10 @@ class Cubie {
 
   constructor(cube, x, y, z, size, dim) {
     this.cube = cube;
-    this.dim = dim;
     this.length = size / dim;
 
     this.position = new p5.Vector(x, y, z);
-    this.pos = this.position;
+    this.drawOffset = newDiagVector((this.cube.dim - 1) / 2);
     this._updateGraphicPosition();
 
     let index = 0;
@@ -104,7 +116,10 @@ class Cubie {
 
       let color;
       Object.entries(Cube.directionMap).forEach(([k, { i, v }]) => {
-        if (arr[i] === v && mapPos(this.dim, vecToArr(this.pos)[i]) === v) {
+        if (
+          arr[i] === v &&
+          mapPos(this.cube.dim, vToA(this.position)[i]) === v
+        ) {
           color = colors[k];
         }
       });
@@ -117,18 +132,25 @@ class Cubie {
   }
 
   _updateGraphicPosition() {
-    const offset = newDiagVector((this.dim - 1) / 2);
-    this.graphicPosition = this.position.copy().sub(offset).mult(this.length);
+    this._align();
+    this.graphicPosition = this.position
+      .copy()
+      .sub(this.drawOffset)
+      .mult(this.length);
   }
 
   get _visibleStickers() {
-    const onFace = (num) => num === 0 || num === this.dim - 1;
+    const onFace = (num) => num === 0 || num === this.cube.dim - 1;
 
     return ["x", "y", "z"].reduce((a, v) => a + onFace(this.position[v]), 0);
   }
 
   get onFace() {
     return this._visibleStickers > 0;
+  }
+
+  _align() {
+    this.position = roundVector(this.position);
   }
 
   drawFace(face) {

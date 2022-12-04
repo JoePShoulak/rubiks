@@ -2,6 +2,10 @@ function windowResized() {
   resizeCanvas(innerWidth, innerHeight);
 }
 
+function toggleLoop() {
+  isLooping() ? noLoop() : loop();
+}
+
 let cube;
 let easyCam;
 const scale = 0.5;
@@ -13,6 +17,10 @@ function setup() {
   easyCam = createEasyCam();
 
   document.oncontextmenu = () => false;
+
+  const button = createButton("Toggle Loop");
+  button.position(0, 0);
+  button.mouseClicked(toggleLoop);
 }
 
 function draw() {
