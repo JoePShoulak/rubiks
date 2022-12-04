@@ -1,11 +1,67 @@
-const directionMap = {
-  L: { i: 0, v: -1 },
-  R: { i: 0, v: 1 },
-  U: { i: 1, v: -1 },
-  D: { i: 1, v: 1 },
-  B: { i: 2, v: -1 },
-  F: { i: 2, v: 1 },
-};
+class Cube {
+  static colorSchemes = {
+    western: {
+      U: "white",
+      L: "orange",
+      F: "green",
+      R: "red",
+      B: "blue",
+      D: "yellow",
+    },
+
+    japanese: {
+      U: "white",
+      L: "orange",
+      F: "green",
+      R: "red",
+      B: "yellow",
+      D: "blue",
+    },
+  };
+
+  static directionMap = {
+    L: { i: 0, v: -1 },
+    R: { i: 0, v: 1 },
+    U: { i: 1, v: -1 },
+    D: { i: 1, v: 1 },
+    B: { i: 2, v: -1 },
+    F: { i: 2, v: 1 },
+  };
+
+  constructor(dim, size, { colorScheme } = {}) {
+    this.dim = dim;
+    this.colorScheme = colorScheme ?? Cube.colorSchemes.western;
+    this.cubies = this._generateCubies(dim, size);
+  }
+
+  _generateCubies(dim, size) {
+    return arrayFromMap(dim, (_face, i) =>
+      arrayFromMap(dim, (_row, j) =>
+        arrayFromMap(dim, (_c, k) => new Cubie(this, i, j, k, size, dim))
+      )
+    )
+      .flat()
+      .flat()
+      .filter((cubie) => cubie.onFace);
+  }
+
+  get faces() {
+    const cubies = this.cubies;
+    const faces = {};
+
+    Object.entries(Cube.directionMap).forEach(([k, { i, v }]) => {
+      faces[k] = cubies.filter(
+        (c) => mapPos(this.dim, vecToArr(c.pos)[i]) === v
+      );
+    });
+
+    return faces;
+  }
+
+  draw() {
+    this.cubies.forEach((cubie) => cubie.draw());
+  }
+}
 
 class Cubie {
   static generateFacePoints(arr) {
@@ -51,7 +107,7 @@ class Cubie {
       if (it === 1) index++;
 
       let color;
-      Object.entries(directionMap).forEach(([k, { i, v }]) => {
+      Object.entries(Cube.directionMap).forEach(([k, { i, v }]) => {
         if (arr[i] === v && mapPos(this.dim, vecToArr(this.pos)[i]) === v) {
           color = colors[k];
         }
@@ -95,61 +151,5 @@ class Cubie {
     translate(this.graphicPosition);
     this.stickers.forEach((face) => this.drawFace(face));
     pop();
-  }
-}
-
-class Cube {
-  static colorSchemes = {
-    western: {
-      U: "white",
-      L: "orange",
-      F: "green",
-      R: "red",
-      B: "blue",
-      D: "yellow",
-    },
-
-    japanese: {
-      U: "white",
-      L: "orange",
-      F: "green",
-      R: "red",
-      B: "yellow",
-      D: "blue",
-    },
-  };
-
-  constructor(dim, size, { colorScheme } = {}) {
-    this.dim = dim;
-    this.colorScheme = colorScheme ?? Cube.colorSchemes.western;
-    this.cubies = this._generateCubies(dim, size);
-  }
-
-  _generateCubies(dim, size) {
-    return arrayFromMap(dim, (_face, i) =>
-      arrayFromMap(dim, (_row, j) =>
-        arrayFromMap(dim, (_c, k) => new Cubie(this, i, j, k, size, dim))
-      )
-    )
-      .flat()
-      .flat()
-      .filter((cubie) => cubie.onFace);
-  }
-
-  get faces() {
-    const cubies = this.cubies;
-    const faces = {};
-
-    Object.entries(directionMap).forEach(([k, { i, v }]) => {
-      faces[k] = cubies.filter(
-        (c) => mapPos(this.dim, vecToArr(c.pos)[i]) === v
-      );
-    });
-
-    return faces;
-  }
-
-  draw() {
-    this.cubies.forEach((cubie) => cubie.draw());
   }
 }
