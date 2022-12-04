@@ -54,17 +54,49 @@ class Cube {
     return faces;
   }
 
-  rotate() {
-    cube.faces.U.forEach((cubie) => {
-      const axis = new p5.Vector(0, 1, 0);
-      const offset = cubie.drawOffset;
-      const pos = cubie.position.sub(offset);
-      cubie.position = rotateAround(pos, axis, HALF_PI).add(offset);
-      cubie.stickers = cubie.stickers.map((s) =>
-        rotateSticker(s, axis, HALF_PI)
-      );
-      cubie._updateGraphicPosition();
-    });
+  get rotate() {
+    const angle = HALF_PI;
+
+    function rotateFace(cubies, axis, rev = false) {
+      cubies.forEach((cubie) => {
+        const offset = cubie.drawOffset;
+        const pos = cubie.position.sub(offset);
+        cubie.position = rotateAround(pos, axis, rev ? -angle : angle).add(
+          offset
+        );
+        cubie.stickers = cubie.stickers.map((s) =>
+          rotateSticker(s, axis, angle)
+        );
+        cubie._updateGraphicPosition();
+      });
+    }
+
+    const basicRotations = {
+      U: () => rotateFace(cube.faces.U, dirToVec(Cube.directionMap.U)),
+      D: () => rotateFace(cube.faces.D, dirToVec(Cube.directionMap.D)),
+      L: () => rotateFace(cube.faces.L, dirToVec(Cube.directionMap.L)),
+      R: () => rotateFace(cube.faces.R, dirToVec(Cube.directionMap.R)),
+      F: () => rotateFace(cube.faces.F, dirToVec(Cube.directionMap.F)),
+      B: () => rotateFace(cube.faces.B, dirToVec(Cube.directionMap.B)),
+
+      U_: () => rotateFace(cube.faces.U, dirToVec(Cube.directionMap.U), true),
+      D_: () => rotateFace(cube.faces.D, dirToVec(Cube.directionMap.D), true),
+      L_: () => rotateFace(cube.faces.L, dirToVec(Cube.directionMap.L), true),
+      R_: () => rotateFace(cube.faces.R, dirToVec(Cube.directionMap.R), true),
+      F_: () => rotateFace(cube.faces.F, dirToVec(Cube.directionMap.F), true),
+      B_: () => rotateFace(cube.faces.B, dirToVec(Cube.directionMap.B), true),
+    };
+
+    return {
+      ...basicRotations,
+
+      U2: () => (basicRotations.U(), basicRotations.U()),
+      D2: () => (basicRotations.D(), basicRotations.D()),
+      L2: () => (basicRotations.L(), basicRotations.L()),
+      R2: () => (basicRotations.R(), basicRotations.R()),
+      F2: () => (basicRotations.F(), basicRotations.F()),
+      B2: () => (basicRotations.B(), basicRotations.B()),
+    };
   }
 
   draw() {

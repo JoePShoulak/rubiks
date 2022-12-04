@@ -37,3 +37,9 @@ function roundVector(vec) {
   const z = round(vec.z);
   return new p5.Vector(x, y, z);
 }
+
+function dirToVec({ i, v }) {
+  const arr = [0, 0, 0];
+  arr[i] = v;
+  return new p5.Vector(...arr);
+}
