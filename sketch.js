@@ -2,11 +2,11 @@ function windowResized() {
   resizeCanvas(innerWidth, innerHeight);
 }
 
-let c;
+let cube;
 
 function setup() {
   createCanvas(innerWidth, innerHeight, "webgl");
-  c = new Cube(3, 200);
+  cube = new Cube(3, 200);
 
   createEasyCam();
   document.oncontextmenu = () => false;
@@ -14,5 +14,5 @@ function setup() {
 
 function draw() {
   background(20);
-  c.show();
+  cube.show();
 }
