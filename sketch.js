@@ -27,6 +27,7 @@ function windowResized() {
 
 function newDemo() {
   moves = arrayFromMap(26, (_move) => randomMove());
+  moves = [...moves, ...undoMoves(moves)];
   index = 0;
   waiting = false;
 }
@@ -40,17 +41,23 @@ function cubeButton(turn, pos) {
 
 function createButtons() {
   Object.keys(Cube.directionMap).forEach((key, index) => {
-    console.log(key);
     cubeButton(key, [buttonPadding, buttonPadding + buttonHeight * index]);
+
     cubeButton(`${key}2`, [
       buttonPadding * 2 + buttonWidth,
       buttonPadding + buttonHeight * index,
     ]);
+
     cubeButton(`${key}_`, [
       buttonPadding * 3 + buttonWidth * 2,
       buttonPadding + buttonHeight * index,
     ]);
   });
+
+  const b = createButton("loop toggle");
+  b.size(100, buttonHeight);
+  b.position(buttonPadding, height - buttonHeight - buttonPadding);
+  b.mousePressed(() => (isLooping() ? noLoop() : loop()));
 }
 
 function setup() {
@@ -64,12 +71,12 @@ function setup() {
 
   newDemo();
 
-  createButtons();
+  // createButtons();
 
-  moves.forEach((m) => {
-    cube.rotate()[m]();
-    cube.cubies.forEach((c) => c._align());
-  });
+  // moves.forEach((m) => {
+  //   cube.rotate()[m]();
+  //   cube.cubies.forEach((c) => c._align());
+  // });
 
   method = new Beginner(cube);
 
@@ -90,6 +97,9 @@ function draw() {
       cube.cubies.forEach((c) => c._align());
       index++;
     }
+  } else if (!waiting) {
+    waiting = true;
+    setTimeout(newDemo, 10 * 1000);
   }
 
   cube.draw();
