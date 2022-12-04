@@ -18,7 +18,17 @@ class Cubie {
       arr[index] = it * 2 - 1;
       if (it === 1) index++;
 
-      return arr;
+      let color;
+      if (arr[0] == -1) color = this.cube.colorScheme.L;
+      if (arr[0] == 1) color = this.cube.colorScheme.R;
+      if (arr[1] == -1) color = this.cube.colorScheme.U;
+      if (arr[1] == 1) color = this.cube.colorScheme.D;
+      if (arr[2] == -1) color = this.cube.colorScheme.B;
+      if (arr[2] == 1) color = this.cube.colorScheme.F;
+
+      color = color ?? this.color;
+
+      return { arr, color };
     });
   }
 
@@ -32,37 +42,38 @@ class Cubie {
     return this._numberOfStickers > 0;
   }
 
-  drawFace(arr) {
-    let dim1, dim2;
+  drawFace(face) {
+    const arr = face.arr;
+    let slot1, slot2;
     let i = 0;
     const points = [];
     const r = this.length / 2;
 
     do {
-      dim1 = i++;
-    } while (arr[dim1] !== 0);
+      slot1 = i++;
+    } while (arr[slot1] !== 0);
 
     do {
-      dim2 = i++;
-    } while (arr[dim2] !== 0);
+      slot2 = i++;
+    } while (arr[slot2] !== 0);
 
     for (let i = 0; i <= 1; i++) {
       for (let j = i; j <= i + 1; j++) {
         const arrCopy = [...arr];
-        arrCopy[dim1] = i * 2 - 1;
-        arrCopy[dim2] = (j % 2) * 2 - 1;
+        arrCopy[slot1] = i * 2 - 1;
+        arrCopy[slot2] = (j % 2) * 2 - 1;
         points.push(arrCopy);
       }
     }
 
     beginShape(QUADS);
+    fill(face.color);
     points.forEach((p) => vertex(...p.map((px) => px * r)));
     endShape();
   }
 
   show() {
     push();
-    fill(this.color);
     stroke(0);
     strokeWeight(3);
     translate(this.graphicPosition);
