@@ -3,12 +3,14 @@ function windowResized() {
 }
 
 let cube;
+let easyCam;
 
 function setup() {
   createCanvas(innerWidth, innerHeight, "webgl");
-  cube = new Cube(3, 200);
+  cube = new Cube(3, height / 2);
 
-  createEasyCam();
+  easyCam = createEasyCam();
+
   document.oncontextmenu = () => false;
 }
 
