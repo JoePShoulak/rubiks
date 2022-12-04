@@ -65,7 +65,7 @@ class Cube {
           offset
         );
         cubie.stickers = cubie.stickers.map((s) =>
-          rotateSticker(s, axis, angle)
+          rotateSticker(s, axis, rev ? -angle : angle)
         );
         cubie._updateGraphicPosition();
       });
