@@ -38,7 +38,8 @@ const scale = 0.5;
 
 function setup() {
   createCanvas(innerWidth, innerHeight, "webgl");
-  cube = new Cube(3, height * scale);
+  const constraint = Math.min(height, width);
+  cube = new Cube(3, constraint * scale);
 
   easyCam = createEasyCam();
 
