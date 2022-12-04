@@ -27,7 +27,6 @@ function windowResized() {
 
 function newDemo() {
   moves = arrayFromMap(26, (_move) => randomMove());
-  // moves = [...moves, ...undoMoves(moves)];
   index = 0;
   waiting = false;
 }
@@ -80,6 +79,18 @@ function setup() {
 let animate = 0;
 function draw() {
   background(20);
+
+  // TODO: Re-implement animation
+  if (index < moves.length) {
+    if (animate < cube.animateRate) {
+      cube.rotate(true)[moves[index]]();
+      animate++;
+    } else {
+      animate = 0;
+      cube.cubies.forEach((c) => c._align());
+      index++;
+    }
+  }
 
   cube.draw();
 }

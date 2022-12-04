@@ -82,7 +82,6 @@ class Cube {
           rotateSticker(s, axis, rev ? -angle : angle)
         );
         cubie._updateGraphicPosition();
-        if (!animate) cubie._align();
       });
     }
 
@@ -184,6 +183,10 @@ class Cubie {
 
   _align() {
     this.position = roundVector(this.position);
+    // this.stickers = this.stickers.map((s) => {
+    //   s.points = s.points.map((p) => [round(p.x), round(p.y), round(p.z)]);
+    //   return s;
+    // });
   }
 
   _updateGraphicPosition() {

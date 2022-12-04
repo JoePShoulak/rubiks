@@ -26,7 +26,8 @@ function rotateSticker(sticker, axis, angle) {
   sticker.points = sticker.points.map((p) => {
     let vec = new p5.Vector(...p);
     vec = rotateAround(vec, axis, angle);
-    return [round(vec.x), round(vec.y), round(vec.z)];
+    // return [round(vec.x), round(vec.y), round(vec.z)];
+    return [vec.x, vec.y, vec.z];
   });
   return sticker;
 }
