@@ -7,24 +7,28 @@ class Cubie {
     const offset = newDiagVector((dim - 1) / 2);
 
     this.position = new p5.Vector(x, y, z);
+    this.pos = this.position;
     this.graphicPosition = this.position.copy().sub(offset).mult(this.length);
 
     this.color = "gray";
 
     let index = 0;
-    this.faces = arrayFromMap(6, (_faces, i) => {
+    this.stickers = arrayFromMap(6, (_stickers, i) => {
+      const colorScheme = this.cube.colorScheme;
       const arr = [0, 0, 0];
       const it = i % 2;
       arr[index] = it * 2 - 1;
       if (it === 1) index++;
 
-      let color;
-      if (arr[0] == -1) color = this.cube.colorScheme.L;
-      if (arr[0] == 1) color = this.cube.colorScheme.R;
-      if (arr[1] == -1) color = this.cube.colorScheme.U;
-      if (arr[1] == 1) color = this.cube.colorScheme.D;
-      if (arr[2] == -1) color = this.cube.colorScheme.B;
-      if (arr[2] == 1) color = this.cube.colorScheme.F;
+      const mapPos = (pos) => 2 * (pos / (this.dim - 1)) - 1;
+
+      let color = "black";
+      if (arr[0] == -1 && mapPos(this.pos.x) === -1) color = colorScheme.L;
+      if (arr[0] == 1 && mapPos(this.pos.x) === 1) color = colorScheme.R;
+      if (arr[1] == -1 && mapPos(this.pos.y) === -1) color = colorScheme.U;
+      if (arr[1] == 1 && mapPos(this.pos.y) === 1) color = colorScheme.D;
+      if (arr[2] == -1 && mapPos(this.pos.z) === -1) color = colorScheme.B;
+      if (arr[2] == 1 && mapPos(this.pos.z) === 1) color = colorScheme.F;
 
       color = color ?? this.color;
 
@@ -32,14 +36,14 @@ class Cubie {
     });
   }
 
-  get _numberOfStickers() {
+  get _visibleStickers() {
     const onFace = (num) => num === 0 || num === this.dim - 1;
 
     return ["x", "y", "z"].reduce((a, v) => a + onFace(this.position[v]), 0);
   }
 
   get onFace() {
-    return this._numberOfStickers > 0;
+    return this._visibleStickers > 0;
   }
 
   drawFace(face) {
@@ -68,6 +72,7 @@ class Cubie {
 
     beginShape(QUADS);
     fill(face.color);
+    if (face.color === "black") return;
     points.forEach((p) => vertex(...p.map((px) => px * r)));
     endShape();
   }
@@ -77,7 +82,7 @@ class Cubie {
     stroke(0);
     strokeWeight(3);
     translate(this.graphicPosition);
-    this.faces.forEach((face) => this.drawFace(face));
+    this.stickers.forEach((face) => this.drawFace(face));
     pop();
   }
 }
@@ -105,7 +110,6 @@ class Cube {
 
   constructor(dim, size, { colorScheme } = {}) {
     this.dim = dim;
-    // this.size = size;
     this.colorScheme = colorScheme ?? Cube.colorSchemes.western;
     this.cubies = this._generateCubies(dim, size);
   }
@@ -119,6 +123,17 @@ class Cube {
       .flat()
       .flat()
       .filter((cubie) => cubie.onFace);
+  }
+
+  get faces() {
+    return {
+      L: this.cubies.filter((c) => c.position.x === 0),
+      R: this.cubies.filter((c) => c.position.x === this.dim - 1),
+      U: this.cubies.filter((c) => c.position.y === 0),
+      D: this.cubies.filter((c) => c.position.y === this.dim - 1),
+      B: this.cubies.filter((c) => c.position.z === 0),
+      F: this.cubies.filter((c) => c.position.z === this.dim - 1),
+    };
   }
 
   show() {
