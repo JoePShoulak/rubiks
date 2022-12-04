@@ -26,7 +26,7 @@ function rotateSticker(sticker, axis, angle) {
   sticker.points = sticker.points.map((p) => {
     let vec = new p5.Vector(...p);
     vec = rotateAround(vec, axis, angle);
-    return [vec.x, vec.y, vec.z];
+    return [round(vec.x), round(vec.y), round(vec.z)];
   });
   return sticker;
 }
@@ -42,4 +42,10 @@ function dirToVec({ i, v }) {
   const arr = [0, 0, 0];
   arr[i] = v;
   return new p5.Vector(...arr);
+}
+
+function dirToArr({ i, v }) {
+  const arr = [0, 0, 0];
+  arr[i] = v;
+  return arr;
 }

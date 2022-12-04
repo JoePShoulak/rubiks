@@ -43,6 +43,18 @@ class Cube {
       .filter((cubie) => cubie.onFace);
   }
 
+  lookup(...colors) {
+    return this.cubies.filter((c) => {
+      const visibleStickers = c.stickers
+        .map((s) => s.color)
+        .filter((c) => c != "gray");
+      return (
+        colors.every((c) => visibleStickers.includes(c)) &&
+        visibleStickers.length === colors.length
+      );
+    })[0];
+  }
+
   get faces() {
     const cubies = this.cubies;
     const faces = {};
@@ -56,8 +68,8 @@ class Cube {
     return faces;
   }
 
-  get rotate() {
-    const angle = HALF_PI / this.animateRate;
+  rotate(animate = false) {
+    const angle = animate ? HALF_PI / this.animateRate : HALF_PI;
 
     function rotFace(cubies, axis, rev = false) {
       cubies.forEach((cubie) => {
@@ -70,34 +82,35 @@ class Cube {
           rotateSticker(s, axis, rev ? -angle : angle)
         );
         cubie._updateGraphicPosition();
+        if (!animate) cubie._align();
       });
     }
 
-    const basic = {
-      U: () => rotFace(cube.faces.U, dirToVec(Cube.directionMap.U)),
-      D: () => rotFace(cube.faces.D, dirToVec(Cube.directionMap.D)),
-      L: () => rotFace(cube.faces.L, dirToVec(Cube.directionMap.L)),
-      R: () => rotFace(cube.faces.R, dirToVec(Cube.directionMap.R)),
-      F: () => rotFace(cube.faces.F, dirToVec(Cube.directionMap.F)),
-      B: () => rotFace(cube.faces.B, dirToVec(Cube.directionMap.B)),
-
-      U_: () => rotFace(cube.faces.U, dirToVec(Cube.directionMap.U), true),
-      D_: () => rotFace(cube.faces.D, dirToVec(Cube.directionMap.D), true),
-      L_: () => rotFace(cube.faces.L, dirToVec(Cube.directionMap.L), true),
-      R_: () => rotFace(cube.faces.R, dirToVec(Cube.directionMap.R), true),
-      F_: () => rotFace(cube.faces.F, dirToVec(Cube.directionMap.F), true),
-      B_: () => rotFace(cube.faces.B, dirToVec(Cube.directionMap.B), true),
+    const root = {
+      U: (rev) => rotFace(cube.faces.U, dirToVec(Cube.directionMap.U), rev),
+      D: (rev) => rotFace(cube.faces.D, dirToVec(Cube.directionMap.D), rev),
+      L: (rev) => rotFace(cube.faces.L, dirToVec(Cube.directionMap.L), rev),
+      R: (rev) => rotFace(cube.faces.R, dirToVec(Cube.directionMap.R), rev),
+      F: (rev) => rotFace(cube.faces.F, dirToVec(Cube.directionMap.F), rev),
+      B: (rev) => rotFace(cube.faces.B, dirToVec(Cube.directionMap.B), rev),
     };
 
     return {
-      ...basic,
+      ...root,
 
-      U2: () => (basic.U(), basic.U()),
-      D2: () => (basic.D(), basic.D()),
-      L2: () => (basic.L(), basic.L()),
-      R2: () => (basic.R(), basic.R()),
-      F2: () => (basic.F(), basic.F()),
-      B2: () => (basic.B(), basic.B()),
+      U_: () => root.U(true),
+      D_: () => root.D(true),
+      L_: () => root.L(true),
+      R_: () => root.R(true),
+      F_: () => root.F(true),
+      B_: () => root.B(true),
+
+      U2: () => (root.U(), root.U()),
+      D2: () => (root.D(), root.D()),
+      L2: () => (root.L(), root.L()),
+      R2: () => (root.R(), root.R()),
+      F2: () => (root.F(), root.F()),
+      B2: () => (root.B(), root.B()),
     };
   }
 
@@ -137,6 +150,7 @@ class Cubie {
     this.length = size / dim;
 
     this.position = new p5.Vector(x, y, z);
+    this.originalPosition = this.position.copy();
     this.drawOffset = newDiagVector((this.cube.dim - 1) / 2);
     this._updateGraphicPosition();
 
@@ -159,10 +173,13 @@ class Cubie {
       });
 
       return {
+        arr,
         points: Cubie.generateFacePoints(arr),
         color: color ?? "gray",
       };
     });
+
+    this.originalStickers = [...this.stickers];
   }
 
   _align() {
@@ -184,6 +201,14 @@ class Cubie {
 
   get onFace() {
     return this._visibleStickers > 0;
+  }
+
+  get inPosition() {
+    return (
+      this.position.x === this.originalPosition.x &&
+      this.position.y === this.originalPosition.y &&
+      this.position.z === this.originalPosition.z
+    );
   }
 
   drawFace(face) {
