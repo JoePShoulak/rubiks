@@ -57,7 +57,7 @@ class Cube {
   get rotate() {
     const angle = HALF_PI;
 
-    function rotateFace(cubies, axis, rev = false) {
+    function rotFace(cubies, axis, rev = false) {
       cubies.forEach((cubie) => {
         const offset = cubie.drawOffset;
         const pos = cubie.position.sub(offset);
@@ -71,31 +71,31 @@ class Cube {
       });
     }
 
-    const basicRotations = {
-      U: () => rotateFace(cube.faces.U, dirToVec(Cube.directionMap.U)),
-      D: () => rotateFace(cube.faces.D, dirToVec(Cube.directionMap.D)),
-      L: () => rotateFace(cube.faces.L, dirToVec(Cube.directionMap.L)),
-      R: () => rotateFace(cube.faces.R, dirToVec(Cube.directionMap.R)),
-      F: () => rotateFace(cube.faces.F, dirToVec(Cube.directionMap.F)),
-      B: () => rotateFace(cube.faces.B, dirToVec(Cube.directionMap.B)),
+    const basic = {
+      U: () => rotFace(cube.faces.U, dirToVec(Cube.directionMap.U)),
+      D: () => rotFace(cube.faces.D, dirToVec(Cube.directionMap.D)),
+      L: () => rotFace(cube.faces.L, dirToVec(Cube.directionMap.L)),
+      R: () => rotFace(cube.faces.R, dirToVec(Cube.directionMap.R)),
+      F: () => rotFace(cube.faces.F, dirToVec(Cube.directionMap.F)),
+      B: () => rotFace(cube.faces.B, dirToVec(Cube.directionMap.B)),
 
-      U_: () => rotateFace(cube.faces.U, dirToVec(Cube.directionMap.U), true),
-      D_: () => rotateFace(cube.faces.D, dirToVec(Cube.directionMap.D), true),
-      L_: () => rotateFace(cube.faces.L, dirToVec(Cube.directionMap.L), true),
-      R_: () => rotateFace(cube.faces.R, dirToVec(Cube.directionMap.R), true),
-      F_: () => rotateFace(cube.faces.F, dirToVec(Cube.directionMap.F), true),
-      B_: () => rotateFace(cube.faces.B, dirToVec(Cube.directionMap.B), true),
+      U_: () => rotFace(cube.faces.U, dirToVec(Cube.directionMap.U), true),
+      D_: () => rotFace(cube.faces.D, dirToVec(Cube.directionMap.D), true),
+      L_: () => rotFace(cube.faces.L, dirToVec(Cube.directionMap.L), true),
+      R_: () => rotFace(cube.faces.R, dirToVec(Cube.directionMap.R), true),
+      F_: () => rotFace(cube.faces.F, dirToVec(Cube.directionMap.F), true),
+      B_: () => rotFace(cube.faces.B, dirToVec(Cube.directionMap.B), true),
     };
 
     return {
-      ...basicRotations,
+      ...basic,
 
-      U2: () => (basicRotations.U(), basicRotations.U()),
-      D2: () => (basicRotations.D(), basicRotations.D()),
-      L2: () => (basicRotations.L(), basicRotations.L()),
-      R2: () => (basicRotations.R(), basicRotations.R()),
-      F2: () => (basicRotations.F(), basicRotations.F()),
-      B2: () => (basicRotations.B(), basicRotations.B()),
+      U2: () => (basic.U(), basic.U()),
+      D2: () => (basic.D(), basic.D()),
+      L2: () => (basic.L(), basic.L()),
+      R2: () => (basic.R(), basic.R()),
+      F2: () => (basic.F(), basic.F()),
+      B2: () => (basic.B(), basic.B()),
     };
   }
 
