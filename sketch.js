@@ -14,5 +14,5 @@ function setup() {
 
 function draw() {
   background(20);
-  cube.show();
+  cube.draw();
 }

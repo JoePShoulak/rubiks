@@ -1,57 +1,17 @@
+const directionMap = {
+  L: { i: 0, v: -1 },
+  R: { i: 0, v: 1 },
+  U: { i: 1, v: -1 },
+  D: { i: 1, v: 1 },
+  B: { i: 2, v: -1 },
+  F: { i: 2, v: 1 },
+};
+
 class Cubie {
-  constructor(cube, x, y, z, size, dim) {
-    this.cube = cube;
-    this.dim = dim;
-    this.length = size / dim;
-
-    const offset = newDiagVector((dim - 1) / 2);
-
-    this.position = new p5.Vector(x, y, z);
-    this.pos = this.position;
-    this.graphicPosition = this.position.copy().sub(offset).mult(this.length);
-
-    this.color = "gray";
-
-    let index = 0;
-    this.stickers = arrayFromMap(6, (_stickers, i) => {
-      const colorScheme = this.cube.colorScheme;
-      const arr = [0, 0, 0];
-      const it = i % 2;
-      arr[index] = it * 2 - 1;
-      if (it === 1) index++;
-
-      const mapPos = (pos) => 2 * (pos / (this.dim - 1)) - 1;
-
-      let color = "black";
-      if (arr[0] == -1 && mapPos(this.pos.x) === -1) color = colorScheme.L;
-      if (arr[0] == 1 && mapPos(this.pos.x) === 1) color = colorScheme.R;
-      if (arr[1] == -1 && mapPos(this.pos.y) === -1) color = colorScheme.U;
-      if (arr[1] == 1 && mapPos(this.pos.y) === 1) color = colorScheme.D;
-      if (arr[2] == -1 && mapPos(this.pos.z) === -1) color = colorScheme.B;
-      if (arr[2] == 1 && mapPos(this.pos.z) === 1) color = colorScheme.F;
-
-      color = color ?? this.color;
-
-      return { arr, color };
-    });
-  }
-
-  get _visibleStickers() {
-    const onFace = (num) => num === 0 || num === this.dim - 1;
-
-    return ["x", "y", "z"].reduce((a, v) => a + onFace(this.position[v]), 0);
-  }
-
-  get onFace() {
-    return this._visibleStickers > 0;
-  }
-
-  drawFace(face) {
-    const arr = face.arr;
+  static generateFacePoints(arr) {
     let slot1, slot2;
     let i = 0;
     const points = [];
-    const r = this.length / 2;
 
     do {
       slot1 = i++;
@@ -70,14 +30,67 @@ class Cubie {
       }
     }
 
+    return points;
+  }
+
+  constructor(cube, x, y, z, size, dim) {
+    this.cube = cube;
+    this.dim = dim;
+    this.length = size / dim;
+
+    this.position = new p5.Vector(x, y, z);
+    this._updateGraphicPosition();
+
+    let index = 0;
+    this.stickers = arrayFromMap(6, (_stickers, i) => {
+      const colors = this.cube.colorScheme;
+      const arr = [0, 0, 0];
+      const it = i % 2;
+      arr[index] = it * 2 - 1;
+      if (it === 1) index++;
+
+      let color;
+      Object.entries(directionMap).forEach(([k, { i, v }]) => {
+        if (
+          arr[i] === v &&
+          mapPos(this.dim, vecToArr(this.position)[i]) === v
+        ) {
+          color = colors[k];
+        }
+      });
+
+      return {
+        points: Cubie.generateFacePoints(arr),
+        color: color ?? "gray",
+      };
+    });
+  }
+
+  _updateGraphicPosition() {
+    const offset = newDiagVector((this.dim - 1) / 2);
+    this.graphicPosition = this.position.copy().sub(offset).mult(this.length);
+  }
+
+  get _visibleStickers() {
+    const onFace = (num) => num === 0 || num === this.dim - 1;
+
+    return ["x", "y", "z"].reduce((a, v) => a + onFace(this.position[v]), 0);
+  }
+
+  get onFace() {
+    return this._visibleStickers > 0;
+  }
+
+  drawFace(face) {
     beginShape(QUADS);
     fill(face.color);
     if (face.color === "black") return;
-    points.forEach((p) => vertex(...p.map((px) => px * r)));
+    const r = this.length / 2;
+    face.points.forEach((p) => vertex(...p.map((px) => px * r)));
     endShape();
   }
 
-  show() {
+  draw() {
     push();
     stroke(0);
     strokeWeight(3);
@@ -126,17 +139,19 @@ class Cube {
   }
 
   get faces() {
-    return {
-      L: this.cubies.filter((c) => c.position.x === 0),
-      R: this.cubies.filter((c) => c.position.x === this.dim - 1),
-      U: this.cubies.filter((c) => c.position.y === 0),
-      D: this.cubies.filter((c) => c.position.y === this.dim - 1),
-      B: this.cubies.filter((c) => c.position.z === 0),
-      F: this.cubies.filter((c) => c.position.z === this.dim - 1),
-    };
+    const cubies = this.cubies;
+    const faces = {};
+
+    Object.entries(directionMap).forEach(([k, { i, v }]) => {
+      faces[k] = cubies.filter(
+        (c) => mapPos(this.dim, vecToArr(c.pos)[i]) === v
+      );
+    });
+
+    return faces;
   }
 
-  show() {
-    this.cubies.forEach((cubie) => cubie.show());
+  draw() {
+    this.cubies.forEach((cubie) => cubie.draw());
   }
 }
