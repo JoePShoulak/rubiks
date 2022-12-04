@@ -15,4 +15,8 @@ function setup() {
 function draw() {
   background(20);
   c.show();
+  noFill();
+  stroke("orange");
+  strokeWeight(0.1);
+  sphere(50);
 }
