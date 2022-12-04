@@ -39,6 +39,7 @@ class Cubie {
     this.length = size / dim;
 
     this.position = new p5.Vector(x, y, z);
+    this.pos = this.position;
     this._updateGraphicPosition();
 
     let index = 0;
@@ -51,10 +52,7 @@ class Cubie {
 
       let color;
       Object.entries(directionMap).forEach(([k, { i, v }]) => {
-        if (
-          arr[i] === v &&
-          mapPos(this.dim, vecToArr(this.position)[i]) === v
-        ) {
+        if (arr[i] === v && mapPos(this.dim, vecToArr(this.pos)[i]) === v) {
           color = colors[k];
         }
       });
