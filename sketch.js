@@ -2,10 +2,6 @@ function windowResized() {
   resizeCanvas(innerWidth, innerHeight);
 }
 
-function toggleLoop() {
-  isLooping() ? noLoop() : loop();
-}
-
 let moves = [
   "U2",
   "R2",
@@ -47,10 +43,6 @@ function setup() {
   easyCam = createEasyCam();
 
   document.oncontextmenu = () => false;
-
-  const button = createButton("Toggle Loop");
-  button.position(0, 0);
-  button.mouseClicked(toggleLoop);
 }
 
 let index = 0;
