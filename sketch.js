@@ -54,11 +54,20 @@ function setup() {
 }
 
 let index = 0;
+let waiting = false;
 
 function draw() {
   background(20);
-  if (index < moves.length && frameCount % 10 === 0) {
+  if (index < moves.length && frameCount % 3 === 0) {
     cube.rotate[moves[index++]]();
+  } else {
+    if (!waiting) {
+      waiting = true;
+      setTimeout(() => {
+        index = 0;
+        waiting = false;
+      }, 10 * 1000);
+    }
   }
   cube.draw();
 }
